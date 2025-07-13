@@ -1,0 +1,207 @@
+
+
+
+################################################# Auto Update #############################################################
+function updateDailyShopSlots(): #forceUpdateShop
+    set {_y} to 1
+    loop 14 times:
+        set {_x} to a random integer between 1 and 25
+        while {_usedNumbers::%{_x}%} is set:
+            set {_x} to a random integer between 1 and 25
+        set {_usedNumbers::%{_x}%} to 0
+        set {DailyShopSlots::%{_y}%} to {_x}
+        set {DailyShopResetTimer} to now
+        add 1 to {_y}
+
+every hour:
+    if time since {DailyShopResetTimer} is more than 24 hours:
+        updateDailyShopSlots()
+        make console execute "/announcement &aThe daily shop has been updated! Check it out with /dailyshop or /daily."
+###########################################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+########################### ==== Main Commands ==== ###################################################################################################################################
+command /dailyshop:
+    aliases: /daily, /ds 
+    trigger:
+        create a gui with virtual chest inventory with 4 rows named "             &3ᴅᴀɪʟʏ sʜᴏᴘ":
+            make gui slot 0,8, and 27 with cyan stained glass pane named "&r"
+            make gui slot 35 with a barrier named "&c<- Go Back":
+                close the player's inventory
+                make player execute "/shop"
+            make gui slot 4 with a clock named "&aNext Daily Reset In:" with lore "&a[ &fx x x x x &a]"
+
+
+            set {_c} to 10
+            set {_y} to 1
+            loop 14 times:
+
+                make gui slot {_c} with {DailyShopItems::%{DailyShopSlots::%{_y}%}%} with lore "&3Cost: [ &6%{DailyShopItems::%{DailyShopSlots::%{_y}%}%::price}% Coins &3]":
+                    purchaseDailyShopItem(player, {DailyShopSlots::%{_y}%})
+                add 1 to {_y}
+                if {_c} is 16:
+                    set {_c} to 19
+                else:
+                    add 1 to {_c}
+   
+
+            
+        show the last gui to player
+
+##############################################################################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+################################################################################# ===== Purchase Function ===== ########################################################################################################
+function purchaseDailyShopItem(p: player, item: integer):
+    set {_price} to {DailyShopItems::%{_item}%::price} parsed as an integer
+    if {DailyShopItems::%{_item}%} is set:
+        create a gui with virtual chest with 3 rows named "&3Confirm Purchase":
+            make gui slot 11 with 1 of {DailyShopItems::%{_item}%} named "&ax1 &f%{DailyShopItems::%{_item}%}%" with lore "&aAre you sure you want this item? %nl%&aCost: [ &e%{_price}*1% Coins &a]":
+                if {_p}'s balance is more than {_price}:
+                    remove {_price} from {_p}'s balance
+                    give {_p} 1 of {DailyShopItems::%{_item}%}
+                    send "&a+1 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*1)% Coins" to {_p}
+                else:
+                    send "&cYou do not have enough coins to purchase this item!" to {_p}
+
+
+            make gui slot 12 with 8 of {DailyShopItems::%{_item}%} named "&ax8 &f%{DailyShopItems::%{_item}%}%" with lore "&aAre you sure you want this item? %nl%&aCost: [ &e%{_price}*8% Coins &a]":
+                if {_p}'s balance is less than ({_price}*8):
+                    send "&cYou do not have enough coins to purchase this item!" to {_p}
+                else:
+                    remove ({_price}*8) from {_p}'s balance
+                    give {_p} 8 of {DailyShopItems::%{_item}%}
+                    send "&a+8 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*8)% Coins" to {_p}
+
+            make gui slot 13 with 16 of {DailyShopItems::%{_item}%} named "&ax16 &f%{DailyShopItems::%{_item}%}%" with lore "&aAre you sure you want this item? %nl%&aCost: [ &e%{_price}*16% Coins &a]":
+                if {_p}'s balance is less than ({_price}*16):
+                    send "&cYou do not have enough coins to purchase this item!" to {_p}
+                else:
+                    remove ({_price}*16) from {_p}'s balance
+                    give {_p} 16 of {DailyShopItems::%{_item}%}
+                    send "&a+16 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*16)% Coins" to {_p}
+
+            make gui slot 14 with 32 of {DailyShopItems::%{_item}%} named "&ax32 &f%{DailyShopItems::%{_item}%}%" with lore "&aAre you sure you want this item? %nl%&aCost: [ &e%{_price}*32% Coins &a]":
+                if {_p}'s balance is less than ({_price}*32):
+                    send "&cYou do not have enough coins to purchase this item!" to {_p}
+                else:
+                    remove ({_price}*32) from {_p}'s balance
+                    give {_p} 32 of {DailyShopItems::%{_item}%}
+                    send "&a+32 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*32)% Coins" to {_p}
+
+            make gui slot 15 with 64 of {DailyShopItems::%{_item}%} named "&ax64 &f%{DailyShopItems::%{_item}%}%" with lore "&aAre you sure you want this item? %nl%&aCost: [ &e%({_price}*64)% Coins &a]":
+                if {_p}'s balance is less than ({_price}*64):
+                    send "&cYou do not have enough coins to purchase this item!" to {_p}
+                else:
+                    remove ({_price}*64) from {_p}'s balance
+                    give {_p} 64 of {DailyShopItems::%{_item}%}
+                    send "&a+64 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*64)% Coins" to {_p}
+                close {_p}'s inventory
+        show the last gui to {_p}
+###################################################################################################################################################################################################################
+
+
+
+
+
+
+
+
+
+##################################################### Defining Shop Enties ##########################################################
+on load:
+    updateDailyShopSlots()
+    delete {DailyShopItems::*}
+
+    set {DailyShopItems::1} to paper named "&f&lWhite Scroll" #white scroll (AE)
+    set {DailyShopItems::1::price} to "17500"
+    
+    set {DailyShopItems::2} to paper named "0&lBlack Scroll" #black scroll (AE)
+    set {DailyShopItems::2::price} to "15000"
+
+    set {DailyShopItems::3} to end portal frame
+    set {DailyShopItems::3::price} to "10000"
+
+    set {DailyShopItems::4} to grass block
+    set {DailyShopItems::4::price} to "25"
+
+    set {DailyShopItems::5} to dirt
+    set {DailyShopItems::5::price} to "10"
+
+    set {DailyShopItems::6} to horse spawn egg
+    set {DailyShopItems::6::price} to "15000"
+
+    set {DailyShopItems::7} to dragon breath
+    set {DailyShopItems::7::price} to "10000"
+
+    set {DailyShopItems::8} to totem of undying
+    set {DailyShopItems::8::price} to "20000"
+
+    set {DailyShopItems::9} to enchanted golden apple
+    set {DailyShopItems::9::price} to "10000"
+
+    set {DailyShopItems::10} to experience bottle
+    set {DailyShopItems::10::price} to "750"
+
+    set {DailyShopItems::11} to chorus fruit
+    set {DailyShopItems::11::price} to "1200"
+
+    set {DailyShopItems::12} to netherite upgrade smithing template
+    set {DailyShopItems::12::price} to "30000"
+
+    set {DailyShopItems::13} to cooked beef
+    set {DailyShopItems::13::price} to "50"
+
+    set {DailyShopItems::14} to enchanted book named "&fMending" #mending
+    set {DailyShopItems::14::price} to "50000"
+
+    set {DailyShopItems::15} to enchanted book named "&fUnbreaking I" #unbreaking 1
+    set {DailyShopItems::15::price} to "20000"
+
+    set {DailyShopItems::16} to enchanted book named "&fEfficiency I" #efficiency 1
+    set {DailyShopItems::16::price} to "20000"
+
+    set {DailyShopItems::17} to spectral arrow
+    set {DailyShopItems::17::price} to "1000"
+
+    set {DailyShopItems::18} to firework rocket
+    set {DailyShopItems::18::price} to "500"
+
+    set {DailyShopItems::19} to wither skeleton skull
+    set {DailyShopItems::19::price} to "45000"
+
+    set {DailyShopItems::20} to villager spawn egg
+    set {DailyShopItems::20::price} to "69000"
+
+    set {DailyShopItems::21} to sheep spawn egg
+    set {DailyShopItems::21::price} to "23000"
+
+    set {DailyShopItems::22} to golden carrot
+    set {DailyShopItems::22::price} to "800"
+
+    set {DailyShopItems::23} to golden apple
+    set {DailyShopItems::23::price} to "5000"
+
+    set {DailyShopItems::24} to blue ice
+    set {DailyShopItems::24::price} to "450"
+
+    set {DailyShopItems::25} to netherite ingot
+    set {DailyShopItems::25::price} to "100000"
+##################################################################################################################################################
