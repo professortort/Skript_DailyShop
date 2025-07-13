@@ -1,12 +1,3 @@
-## Designed and Developed by ProfessorTort for TopBlockMC  |
-# Feel free to use any part of this logic for yourself     |
-# Credit is always appreciated :)                          |
-# =========================================================|
-
-
-
-
-
 
 
 
@@ -76,6 +67,42 @@ command /dailyshop:
 
 
 
+################################################################################## ===== Special Item Reward Function ===== ######################################################################
+function specialDailyShopItems(p: player, item: integer, amount: integer=1) :: boolean:
+    if {DailyShopItems::%{_item}%} is set:
+        if {_p}'s balance is more than ({DailyShopItems::%{_item}%::price} parsed as an integer)*{_amount}:
+            remove ({DailyShopItems::%{_item}%::price} parsed as an integer)*{_amount} from {_p}'s balance
+            send "&a+%{_amount}% &f%{DailyShopItems::%{_item}%}%&a,&6 - %(({DailyShopItems::%{_item}%::price} parsed as an integer)*{_amount})% Coins" to {_p}
+            
+
+
+            #### designate special item reward functions here ##########################
+
+            if {_item} is 1: #white scroll (AE)
+                make console execute "/ae giveitem %{_p}% whitescroll %{_amount}%"
+            else if {_item} is 2: #black scroll (AE)
+                make console execute "/ae giveitem %{_p}% blackscroll %{_amount}%"
+
+            ##########################################################################
+            return true
+
+
+
+
+        else:
+            send "&cYou do not have enough coins to purchase this item!" to {_p}
+            return false
+#######################################################################################################################################################################################################
+
+
+
+
+
+
+
+
+
+
 
 ################################################################################# ===== Purchase Function ===== ########################################################################################################
 function purchaseDailyShopItem(p: player, item: integer):
@@ -84,6 +111,8 @@ function purchaseDailyShopItem(p: player, item: integer):
         create a gui with virtual chest with 3 rows named "&3Confirm Purchase":
             make gui slot 11 with 1 of {DailyShopItems::%{_item}%} named "&ax1 &f%{DailyShopItems::%{_item}%}%" with lore "&aAre you sure you want this item? %nl%&aCost: [ &e%{_price}*1% Coins &a]":
                 if {_p}'s balance is more than {_price}:
+                    if specialDailyShopItems({_p}, {_item}, 1) is true:
+                        stop
                     remove {_price} from {_p}'s balance
                     give {_p} 1 of {DailyShopItems::%{_item}%}
                     send "&a+1 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*1)% Coins" to {_p}
@@ -95,6 +124,8 @@ function purchaseDailyShopItem(p: player, item: integer):
                 if {_p}'s balance is less than ({_price}*8):
                     send "&cYou do not have enough coins to purchase this item!" to {_p}
                 else:
+                    if specialDailyShopItems({_p}, {_item}, 8) is true:
+                        stop
                     remove ({_price}*8) from {_p}'s balance
                     give {_p} 8 of {DailyShopItems::%{_item}%}
                     send "&a+8 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*8)% Coins" to {_p}
@@ -103,6 +134,8 @@ function purchaseDailyShopItem(p: player, item: integer):
                 if {_p}'s balance is less than ({_price}*16):
                     send "&cYou do not have enough coins to purchase this item!" to {_p}
                 else:
+                    if specialDailyShopItems({_p}, {_item}, 16) is true:
+                        stop
                     remove ({_price}*16) from {_p}'s balance
                     give {_p} 16 of {DailyShopItems::%{_item}%}
                     send "&a+16 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*16)% Coins" to {_p}
@@ -111,6 +144,8 @@ function purchaseDailyShopItem(p: player, item: integer):
                 if {_p}'s balance is less than ({_price}*32):
                     send "&cYou do not have enough coins to purchase this item!" to {_p}
                 else:
+                    if specialDailyShopItems({_p}, {_item}, 32) is true:
+                        stop
                     remove ({_price}*32) from {_p}'s balance
                     give {_p} 32 of {DailyShopItems::%{_item}%}
                     send "&a+32 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*32)% Coins" to {_p}
@@ -119,6 +154,8 @@ function purchaseDailyShopItem(p: player, item: integer):
                 if {_p}'s balance is less than ({_price}*64):
                     send "&cYou do not have enough coins to purchase this item!" to {_p}
                 else:
+                    if specialDailyShopItems({_p}, {_item}, 64) is true:
+                        stop
                     remove ({_price}*64) from {_p}'s balance
                     give {_p} 64 of {DailyShopItems::%{_item}%}
                     send "&a+64 &f%{DailyShopItems::%{_item}%}%&a,&6 - %({_price}*64)% Coins" to {_p}
@@ -142,7 +179,7 @@ on load:
     set {DailyShopItems::1} to paper named "&f&lWhite Scroll" #white scroll (AE)
     set {DailyShopItems::1::price} to "17500"
     
-    set {DailyShopItems::2} to paper named "0&lBlack Scroll" #black scroll (AE)
+    set {DailyShopItems::2} to paper named "O&lBlack Scroll" #black scroll (AE)
     set {DailyShopItems::2::price} to "15000"
 
     set {DailyShopItems::3} to end portal frame
